@@ -1,23 +1,30 @@
 const User = require("../models/user");
-var bcrypt = require("bcrypt");
 const userController = {};
 
 const {saltPassword, comparePasswords} = require('../helpers/passwordsHandler')
-
-const findUser = require('../helpers/findUser')
+const { validateEmail, findUser, validateUsername } = require("../helpers/validation");
+const assigneToken = require("../helpers/assignJWT");
 
 // Register new user
 userController.register = async (req, res, next) => {
-  const { first_name, last_name, email, password, username, bYear, bMonth, bDay, gender } = req.body; // extract them from req.body
+  const { first_name, last_name, email, password,  bYear, bMonth, bDay, gender } = req.body; // extract them from req.body
 
   const emailExists = await findUser(email);
   const hashPassword = await saltPassword(password)
+ 
+  const tempUsername = first_name + last_name
+
+  let username = await validateUsername(tempUsername) 
   if (emailExists) {
     return res.status(403).send({ error: "Email is already in use " });
   }
 
+
+  if(!validateEmail(email)){
+    return res.status(400).send({ error: "Invalid email" });
+  }
   const newUser = new User({
-    first_name, last_name, email, password : hashPassword, username, bYear, bMonth, bDay, gender,
+    first_name, last_name, email, password : hashPassword, username , bYear, bMonth, bDay, gender,
   });
 
   try {
@@ -54,7 +61,9 @@ userController.login = async (req, res, next) => {
     }
 
     // If logged in , generate JWT token
-    return res.status(200).send({ success: ' User loged in' });
+    const token = assigneToken.generateToken({ user, expire: "5d" });
+    user.save();
+    return res.status(200).send({success: ' User logged in success',  token });
   } catch (e) {
     console.log(e);
     return next(e);
