@@ -1,11 +1,12 @@
 const User = require("../models/user");
+const jwt = require("jsonwebtoken");
 const userController = {};
 
 const {saltPassword, comparePasswords} = require('../helpers/passwordsHandler')
 const { validateEmail, findUser, validateUsername } = require("../helpers/validation");
 const { sendVerificationEmail} = require("../helpers/mailer");
 const assigneToken = require("../helpers/assignJWT");
-// const {sendVerificationEmail}  = require('../mailer/index')
+
 
 // Register new user
 userController.register = async (req, res, next) => {
@@ -70,6 +71,35 @@ userController.login = async (req, res, next) => {
     const token = assigneToken.generateToken({ user, expire: "5d" });
     user.save();
     return res.status(200).send({success: ' User logged in success',  token });
+  } catch (e) {
+    console.log(e);
+    return next(e);
+  }
+};
+
+
+// Activte account
+// Login 
+userController.activateAccount = async (req, res, next) => {
+  const { token } = req.body;
+
+  try {
+
+    // verify if its valid
+    const {user} = jwt.verify(token, process.env.SECRET)
+
+    // find user by id
+    const check = await findUser(user.email)
+    console.log(check);
+    if(check.verified){
+
+    return res.status(200).send({ error: ' This account is already activated'});
+    }
+
+    check.verified = true;
+    await check.save()
+    // await User.findByIdAndUpdate(user.verified, { verified:true})
+    return res.status(200).send({success: ' Your account is activated'});
   } catch (e) {
     console.log(e);
     return next(e);
