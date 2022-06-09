@@ -1,20 +1,23 @@
 const User = require("../models/user");
-
+var bcrypt = require("bcrypt");
 const userController = {};
 
-userController.test = async (req, res, next) => {
-  res.send({
-    message: " Testing ",
-  });
-};
-module.exports = userController;
+const {saltPassword, comparePasswords} = require('../helpers/passwordsHandler')
 
+const findUser = require('../helpers/findUser')
+
+// Register new user
 userController.register = async (req, res, next) => {
-  const { name } = req.body; // extract them from req.body
+  const { first_name, last_name, email, password, username, bYear, bMonth, bDay, gender } = req.body; // extract them from req.body
 
-  console.log(req.body);
+  const emailExists = await findUser(email);
+  const hashPassword = await saltPassword(password)
+  if (emailExists) {
+    return res.status(403).send({ error: "Email is already in use " });
+  }
+
   const newUser = new User({
-    name,
+    first_name, last_name, email, password : hashPassword, username, bYear, bMonth, bDay, gender,
   });
 
   try {
@@ -30,3 +33,32 @@ userController.register = async (req, res, next) => {
     }
   }
 };
+
+// Login 
+userController.login = async (req, res, next) => {
+  const { email, password } = req.body;
+
+  let incorrect_email_password = " Incorrect email or password";
+  try {
+
+    const user = await findUser(email);
+    if (!user) {
+      return res.status(403).send({ error: incorrect_email_password });
+    }
+
+    // Check if passwords match
+    const isPasswordMatch = await comparePasswords(password, user.password) 
+    if (!isPasswordMatch) {
+      console.log("password in correct");
+      return res.status(403).send({ error: incorrect_email_password });
+    }
+
+    // If logged in , generate JWT token
+    return res.status(200).send({ success: ' User loged in' });
+  } catch (e) {
+    console.log(e);
+    return next(e);
+  }
+};
+
+module.exports = userController;

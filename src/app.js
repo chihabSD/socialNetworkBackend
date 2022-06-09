@@ -21,7 +21,7 @@ mongoose.connection.on("connected", () => {
   console.log("Connected to database"); //display a message
 });
 
-//on error
+// error
 mongoose.connection.on("error", (err) => {
   // if there is an error
   console.error(`Failed to connect to database: ${err}`); //display a message
