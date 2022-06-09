@@ -3,7 +3,9 @@ const userController = {};
 
 const {saltPassword, comparePasswords} = require('../helpers/passwordsHandler')
 const { validateEmail, findUser, validateUsername } = require("../helpers/validation");
+const { sendVerificationEmail} = require("../helpers/mailer");
 const assigneToken = require("../helpers/assignJWT");
+// const {sendVerificationEmail}  = require('../mailer/index')
 
 // Register new user
 userController.register = async (req, res, next) => {
@@ -29,6 +31,10 @@ userController.register = async (req, res, next) => {
 
   try {
     const user = await newUser.save();
+
+    const emailVerificationToken = assigneToken.generateToken({ user, expire: "5d" });
+    const url = `${process.env.BASE_URL}/${emailVerificationToken}`
+    sendVerificationEmail(user.email, user.first_name,url)
     return res.send({ user }); // response with the user object
   } catch (e) {
     //customization to the errer

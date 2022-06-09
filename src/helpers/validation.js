@@ -33,4 +33,5 @@ const validateEmail = (email) => {
     return username
 
   }
-module.exports = { validateEmail, findUser, validateUsername, validateUsername };
+
+module.exports = {  validateEmail, findUser, validateUsername, validateUsername };
