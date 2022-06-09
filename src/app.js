@@ -10,7 +10,7 @@ const app = express();
 // -------- DB Config ------//
 
 // go to process.env and get the mongo url
-mongoose.connect(process.env.MONGO_DB_URL, {
+mongoose.connect(process.env.DATABASE, {
   useNewUrlParser: true,
 
   useUnifiedTopology: true,
