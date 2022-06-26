@@ -2,10 +2,16 @@ const express = require("express");
 const mongoose = require("mongoose");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
-
+var cors = require('cors')
 const user = require("./routes/user");
 
+
+const options = {
+  origin : "http://localhost:3000"
+}
 const app = express();
+app.use(cors())
+app.use(express.json())
 
 // -------- DB Config ------//
 
