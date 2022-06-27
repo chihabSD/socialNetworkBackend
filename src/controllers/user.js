@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const Code = require("../models/code");
 const jwt = require("jsonwebtoken");
 const userController = {};
 
@@ -13,6 +14,8 @@ const {
 } = require("../helpers/validation");
 const { sendVerificationEmail } = require("../helpers/mailer");
 const assigneToken = require("../helpers/assignJWT");
+const generateCode = require("../helpers/generateCode");
+const { sendResetCode } = require("./mailer");
 
 // Get current user profile
 
@@ -233,6 +236,52 @@ userController.resendToken = async (req, res, next) => {
         .status(400)
         .send({ error: " Activation code is broken or invalid " });
     }
+    return next(e);
+  }
+};
+
+// Search User
+userController.searchUser = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email)
+      return res.status(400).send({
+        message: "Email is missing",
+      });
+    const user = await findUser(email);
+    if (!user) {
+      return res.status(403).send({ error: " This user does not exist" });
+    }
+
+    return res.status(200).send({
+      user,
+    });
+  } catch (e) {
+    console.log(e);
+    return next(e);
+  }
+};
+userController.sendResetPasswordCode = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email }).select("-password");
+    if (!user) {
+      return res.status(403).send({ error: " This user does not exist" });
+    }
+    await Code.findOneAndRemove({ user: user._id });
+    const code = generateCode(5);
+
+    const newCode = new Code({
+      code,
+      user: user._id,
+    });
+    await newCode.save();
+    sendResetCode(user.email, user.first_name, code);
+    return res.status(200).send({
+      msg: "Email reset code has been sent to your email ",
+    });
+  } catch (e) {
+    console.log(e);
     return next(e);
   }
 };
