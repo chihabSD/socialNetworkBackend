@@ -12,10 +12,9 @@ const {
   findUser,
   validateUsername,
 } = require("../helpers/validation");
-const { sendVerificationEmail } = require("../helpers/mailer");
+const { sendVerificationEmail, sendResetCode } = require("../helpers/mailer");
 const assigneToken = require("../helpers/assignJWT");
 const generateCode = require("../helpers/generateCode");
-const { sendResetCode } = require("./mailer");
 
 // Get current user profile
 
