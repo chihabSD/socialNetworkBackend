@@ -285,4 +285,49 @@ userController.sendResetPasswordCode = async (req, res, next) => {
     return next(e);
   }
 };
+
+userController.verifyCode = async (req, res, next) => {
+  try {
+    const { email, code } = req.body;
+    const user = await User.findOne({ email })
+    const dCode = await Code.findOne({ user:user._id})
+
+    if (!user) {
+      return res.status(403).send({ error: " This user does not exist" });
+    }
+
+    if(dCode.code !==code) {
+      return res.status(403).send({ error: " Verification code is wrong" });
+    }
+   
+    return res.status(200).send({
+      msg: "Email reset code has been sent to your email ",
+    });
+  } catch (e) {
+    console.log(e);
+    return next(e);
+  }
+};
+
+
+userController.forgotPasswordChange = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const hashPassword = await saltPassword(password);
+    await User.findOneAndUpdate(
+      { email },
+      {
+        password: hashPassword,
+      }
+    );
+    return res.status(200).json({ msg: "Your password was changed" });
+  } catch (e) {
+    console.log(e);
+    return next(e);
+  }
+};
+
+
+
+
 module.exports = userController;

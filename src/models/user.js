@@ -124,10 +124,7 @@ const UserSchema = Schema(
         type: String,
       },
     },
-    code: {
-      type: Number,
-      required: [true],
-    },
+   
     savedPosts: [
       {
         post: {
