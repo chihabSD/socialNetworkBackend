@@ -4,6 +4,7 @@ const logger = require("morgan");
 const bodyParser = require("body-parser");
 var cors = require('cors')
 const user = require("./routes/user");
+const post = require("./routes/post");
 
 
 const options = {
@@ -44,5 +45,6 @@ app.use(bodyParser.json());
 
 // -------- Routes ------//
 app.use("/user", user);
+app.use("/user/post", post);
 
 module.exports = app;
