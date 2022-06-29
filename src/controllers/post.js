@@ -14,7 +14,9 @@ const generateCode = require("../helpers/generateCode");
 postController.createPost = async (req, res) => {
   try {
     const { user } = req.user;
-    const post = await new Post({user:user._id, ...req.body}).save()
+    console.log(req.body);
+    const {text, data} = req.body
+    const post = await new Post({user:user._id,text, images:data ? data:[] }).save()
     return res.status(200).json({ msg: "Post created", post });
   } catch (e) {
     console.log(e);

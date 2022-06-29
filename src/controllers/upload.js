@@ -13,7 +13,6 @@ cloudinary.config({
 
 // Get current user profile
 uploadController.uploadImages = async (req, res) => {
-    console.log(' called ');
   try {
     const { path } = req.body;
     let files = Object.values(req.files).flat();
