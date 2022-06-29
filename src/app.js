@@ -3,8 +3,10 @@ const mongoose = require("mongoose");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
 var cors = require('cors')
+const fileUpload = require('express-fileupload')
 const user = require("./routes/user");
 const post = require("./routes/post");
+const upload = require("./routes/upload");
 
 
 const options = {
@@ -12,6 +14,7 @@ const options = {
 }
 const app = express();
 app.use(cors())
+app.use(fileUpload({useTempFiles:true}))
 app.use(express.json())
 
 // -------- DB Config ------//
@@ -46,5 +49,6 @@ app.use(bodyParser.json());
 // -------- Routes ------//
 app.use("/user", user);
 app.use("/user/post", post);
+app.use("/user/upload", upload);
 
 module.exports = app;
