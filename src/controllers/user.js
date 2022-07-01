@@ -21,9 +21,11 @@ const generateCode = require("../helpers/generateCode");
 userController.currentProfile = async (req, res) => {
   try {
     const { user } = req.user;
-    let userFound = await findUser(user.email);
+    // let userFound = await findUser(user.email);
+    const userFound = await User.find({email:user.email}).select('-password')
+    console.log(userFound);
     const handleReturn = () => {
-      return res.status(200).send({ user: userFound });
+      return res.status(200).send({ user: userFound[0] });
     };
     userFound ? handleReturn() : handleReturn();
   } catch (e) {

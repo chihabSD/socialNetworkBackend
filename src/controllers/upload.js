@@ -12,6 +12,28 @@ cloudinary.config({
 });
 
 // Get current user profile
+uploadController.listImages = async (req, res) => {
+  try {
+    const { path, sort, max } = req.body;
+
+    cloudinary.v2.search
+      .expression(`${path}`)
+      .sort_by("created_at", `${sort}`)
+      .max_results(max)
+      .execute()
+      .then((result) => {
+        res.json(result);
+      })
+      .catch((err) => {
+        console.log(err.error.message);
+      });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ msg: e.message});
+  }
+};
+
+
 uploadController.uploadImages = async (req, res) => {
   try {
     const { path } = req.body;
@@ -29,7 +51,10 @@ uploadController.uploadImages = async (req, res) => {
   }
 };
 
+
 module.exports = uploadController;
+
+
 
 const uploadToCloudinary = async (file, path) => {
     return new Promise((resolve) => {
