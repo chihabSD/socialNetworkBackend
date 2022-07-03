@@ -18,7 +18,7 @@ router.post(`/register`, register);
 router.post(`/login`, login);
 
 //Profile
-router.get("/profile", verifyToken, currentProfile);
+router.get("/profile/:username", verifyToken, currentProfile);
 router.post(`/activateAccount`, verifyToken, activateAccount);
 router.post(`/resendToken`, verifyToken, resendToken);
 router.post(`/searchUser`, searchUser);

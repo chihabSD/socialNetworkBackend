@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const Code = require("../models/code");
+const Post = require("../models/post");
 const jwt = require("jsonwebtoken");
 const userController = {};
 
@@ -21,13 +22,24 @@ const generateCode = require("../helpers/generateCode");
 userController.currentProfile = async (req, res) => {
   try {
     const { user } = req.user;
-    // let userFound = await findUser(user.email);
-    const userFound = await User.find({email:user.email}).select('-password')
-    console.log(userFound);
-    const handleReturn = () => {
-      return res.status(200).send({ user: userFound[0] });
+    const { username } = req.params;
+
+    const option1 = {
+      username,
     };
-    userFound ? handleReturn() : handleReturn();
+    const option2 = {
+      email: user.email,
+    };
+      // username === "undefined" || username === null ? option2 : option1
+    const profile = await User.findOne( {username} ).select("-password");
+
+    if (!profile) {
+      return res.status(200).send({ noProfile: true});
+    }
+    const posts = await Post.find({ user: profile._id }).populate("user");
+
+    return res.status(200).send({ user, posts });
+    // res.json({...profile.toObject(),})
   } catch (e) {
     console.log(e);
   }
@@ -117,7 +129,7 @@ userController.login = async (req, res, next) => {
     // If logged in , generate JWT token
     const token = assigneToken.generateToken({ user, expire: "5d" });
     user.save();
-    return res.status(200).send({ msg: " User logged in success", token });
+    return res.status(200).send({ user, token });
   } catch (e) {
     console.log(e);
     return next(e);
@@ -290,17 +302,17 @@ userController.sendResetPasswordCode = async (req, res, next) => {
 userController.verifyCode = async (req, res, next) => {
   try {
     const { email, code } = req.body;
-    const user = await User.findOne({ email })
-    const dCode = await Code.findOne({ user:user._id})
+    const user = await User.findOne({ email });
+    const dCode = await Code.findOne({ user: user._id });
 
     if (!user) {
       return res.status(403).send({ error: " This user does not exist" });
     }
 
-    if(dCode.code !==code) {
+    if (dCode.code !== code) {
       return res.status(403).send({ error: " Verification code is wrong" });
     }
-   
+
     return res.status(200).send({
       msg: "Email reset code has been sent to your email ",
     });
@@ -309,7 +321,6 @@ userController.verifyCode = async (req, res, next) => {
     return next(e);
   }
 };
-
 
 userController.forgotPasswordChange = async (req, res, next) => {
   try {
@@ -327,8 +338,5 @@ userController.forgotPasswordChange = async (req, res, next) => {
     return next(e);
   }
 };
-
-
-
 
 module.exports = userController;
