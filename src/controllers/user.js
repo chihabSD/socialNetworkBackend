@@ -339,4 +339,17 @@ userController.forgotPasswordChange = async (req, res, next) => {
   }
 };
 
+userController.updateProfilePicture = async (req, res, next) => {
+  try {
+   
+    const {url} = req.body
+    console.log(req.user);
+    const response = await User.findByIdAndUpdate(req.user._id, {picture:url})
+    return res.status(200).json({ url });
+  } catch (e) {
+    console.log(e);
+    return next(e);
+  }
+};
+
 module.exports = userController;

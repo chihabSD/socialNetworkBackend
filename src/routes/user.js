@@ -11,6 +11,7 @@ const {
   sendResetPasswordCode,
   verifyCode,
   forgotPasswordChange,
+  updateProfilePicture,
 } = require("../controllers/user");
 const verifyToken = require("../middlewares/verifyToken");
 
@@ -25,5 +26,6 @@ router.post(`/searchUser`, searchUser);
 router.post(`/sendCode`, sendResetPasswordCode);
 router.post(`/verifyCode`, verifyCode);
 router.post(`/changePassword`, forgotPasswordChange);
+router.put(`/updateProfilePicture`, updateProfilePicture);
 
 module.exports = router;
