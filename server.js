@@ -19,7 +19,6 @@ app.use(
 //routes
 readdirSync("./routes").map((r) => app.use("/", require("./routes/" + r)));
 
-//database
 mongoose
   .connect(process.env.DATABASE, {
     useNewUrlParser: true,
