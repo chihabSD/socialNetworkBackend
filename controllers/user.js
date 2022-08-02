@@ -597,3 +597,12 @@ exports.removeFromSearch = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.test = async (req, res) => {
+  try {
+    
+    res.status(200).json({ worked: true });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

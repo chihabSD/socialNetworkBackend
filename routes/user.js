@@ -24,11 +24,13 @@ const {
   addToSearchHistory,
   getSearchHistory,
   removeFromSearch,
+  test,
 } = require("../controllers/user");
 const { authUser } = require("../middlwares/auth");
 
 const router = express.Router();
 
+router.get("/test", test);
 router.post("/register", register);
 router.post("/activate", authUser, activateAccount);
 router.post("/login", login);
